@@ -26,15 +26,7 @@ class _HomeState extends State<Home> {
 
   String _infoText = 'Informe seus dados';
 
-  FocusNode myFocusNode;
-
-  @override
-  void initState() {
-
-    super.initState();
-
-    myFocusNode = FocusNode();
-  }
+  GlobalKey<FormState> _formKey = GlobalKey();
 
   void _resetFields() {
 
@@ -42,7 +34,10 @@ class _HomeState extends State<Home> {
     heightController.text = '';
     _infoText = 'Informe seus dados';
 
-    myFocusNode.requestFocus();
+
+    setState(() {
+      _formKey = GlobalKey<FormState>();
+    });
   }
 
   void _calculate() {
@@ -93,60 +88,79 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(
-              Icons.person_rounded,
-              size: 120,
-              color: Colors.indigo,
-            ),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Peso (kg):',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(
+                Icons.person_rounded,
+                size: 120,
+                color: Colors.indigo,
               ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Peso (kg):',
+                ),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24
+                ),
+                controller: weightController,
+                // ignore: missing_return
+                validator: (value) {
+                  if(value.isEmpty) {
+                    return 'Insira seu peso';
+                  }
+                },
+              ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Altura (cm):',
+                ),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24
+                ),
+                controller: heightController,
+                // ignore: missing_return
+                validator: (value) {
+                  if(value.isEmpty) {
+                    return 'Insira sua altura!';
+                  }
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: Container(
+                  height: 50.0,
+                  child: ElevatedButton(
+                      child: Text('Calcular',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.indigo)
+                      ),
+                      onPressed: () {
+                        if(_formKey.currentState.validate()) {
+                          _calculate();
+                        }
+                      }
+                      ),
+                ),
+              ),
+              Text(_infoText,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 24
+                fontSize: 20
               ),
-              controller: weightController,
-              focusNode: myFocusNode,
-            ),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Altura (cm):',
-              ),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24
-              ),
-              controller: heightController,
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Container(
-                height: 50.0,
-                child: ElevatedButton(
-                    child: Text('Calcular',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.indigo)
-                    ),
-                    onPressed: _calculate),
-              ),
-            ),
-            Text(_infoText,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20
-            ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
